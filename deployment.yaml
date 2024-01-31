@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name:  nextcloud
+    component: app
+  name: nextcloudx
+spec:
+  selector:
+    matchLabels:
+      component: app
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        component: app
+    spec:
+      containers:
+        - image: public.ecr.aws/docker/library/nextcloud:stable-apache
+          name: app
+          ports:
+            - containerPort: 80
+          volumeMounts:
+          - name: nc-volume
+            mountPath: "/var/www/html"
+      restartPolicy: Always
+      volumes:
+      - name: nc-volume
+        persistentVolumeClaim:
+          claimName: nc-nfs-pvc
